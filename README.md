@@ -58,3 +58,117 @@ export PATH="$HOME/.xylia/bin:$PATH"
 This configuration sets `XYL_HOME` to the directory where Xylia is installed and adds the bin directory to your `PATH`.
 
 5. **Apply the Changes**: To make the changes effective immediately, source the profile file or restart your terminal.
+
+# Documentation
+
+Xylia has 4 basic types
+- `int`: 64 bit integer
+- `char`: 8 bit integer
+- `bool`: `true` or `false`
+- `ptr`: pointer to memory address
+
+## Hello, World!
+
+```xyl
+import std
+
+proc main in
+    "Hello, World!\n" println
+    0 return
+end
+```
+
+Xylia is stack based, meaning all values are a expression that are pushed onto the stack.
+This program first imports the standard library and then defines `main` procedure which is the entry point of the program.
+Xylia does not rely on any indentation so the whole program could be written in one line.
+We first push the `Hello, World\n` onto the stack and then call the `println` function which expects 1 argument, all arguments are just top most values on the stack, then we push 0 and call `return` which returns the top of the stack value from the procedure.
+
+## Operations
+
+```xyl
+proc main in
+    1 1 +
+    dump        # print the top stack value and pop it
+    0 return
+end
+```
+
+This code will push 1 and 1 onto the stack and then we use the `+` to add the top 2 values on stack together. For now the only operations that are supported are `+` `-` and `*`.
+
+## Procedures
+
+```xyl
+proc add int num1 int num2 in
+    num1 num2 +
+    return
+end
+
+proc main in
+    10 12 add
+    dump
+    0 return
+end
+```
+
+This program will add 10 and 12 and print it out
+
+## Code branching
+
+```xyl
+import std
+
+proc main in
+    1 2 =       # Compare 1 and 2 for equality
+    if
+        "Equal" println
+    else
+        "Not equal" println
+    end
+    "Result: " print
+    dump
+    0 return
+end
+```
+
+## While loops
+
+```xyl
+proc main in
+    # Loop from 0 to 9
+    0 while dup 10 < do
+        dup dump
+        1 +
+    end
+end
+```
+
+## Syscalls
+
+It is not recommended to use syscalls directly but it is meant to make libraries and procedures that are not implemented yet
+
+```xyl
+proc main in
+    1 1 "Hello, World!\n" 14
+    syscall 4
+    0 return
+end
+```
+
+This procedure puts `1` (sys_write), `1` (stdout), `"Hello, World!\n"` (const char *buffer) and `14` (size_t length) onto the stack and then calls syscall with `4` arguments, this prints the `Hello, World!` text to the terminal
+
+## Keywords
+
+- `dup` duplicate the top value on stack
+- `drop` delete the top value on stack
+- `swap` swap to 2 values on stack
+- `inc` increment top value on stack
+- `dec` decrement top value on stack
+- `dump` print out the top stack value (as int)
+- `return` return top value on stack
+- `syscall` execute syscall
+- `derefc` dereference pointer on stack to char
+- `derefi` dereference pointer on stack to int
+- `proc` define process
+- `in` end of process arguments, start of process body
+- `true` push `1` on stack
+- `false` push `0` on stack
