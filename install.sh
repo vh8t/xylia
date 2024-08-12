@@ -5,7 +5,8 @@ installed() {
 }
 
 MISSING_DEP=false
-EXPORT_PATH="export XYL_PATH=\"\$HOME/.xylia\""
+EXPORT_PATH="export XYL_HOME=\"\$HOME/.xylia\""
+BIN_PATH="export PATH=\"\$HOME/.xylia/bin:\$PATH\""
 
 if ! installed as; then
   MISSING_DEP=true
@@ -84,8 +85,9 @@ case "$SHELL_PATH" in
     ;;
   *)
     echo "Unknown shell"
-    echo "Make sure to put this command in the shell profile"
+    echo "Make sure to put these commands in the shell profile"
     echo "$EXPORT_PATH"
+    echo "$BIN_PATH"
     exit
     ;;
 esac
@@ -99,21 +101,25 @@ case "$user_input" in
   y|yes)
     if [ -f "$RC_FILE" ]; then
       echo "$EXPORT_PATH" >> "$RC_FILE"
+      echo "$BIN_PATH" >> "$RC_FILE"
       echo "Exported \`$EXPORT_PATH\`"
     else
       echo "$RC_FILE does not exist."
-      echo "Make sure to put this command in the shell profile"
+      echo "Make sure to put these commands in the shell profile"
       echo "$EXPORT_PATH"
+      echo "$BIN_PATH"
     fi
     ;;
   n|no)
-    echo "Make sure to put this command in the shell profile"
+    echo "Make sure to put these commands in the shell profile"
     echo "$EXPORT_PATH"
+    echo "$BIN_PATH"
     ;;
   *)
     echo "Invalid input. Operation aborted."
-    echo "Make sure to put this command in the shell profile"
+    echo "Make sure to put these commands in the shell profile"
     echo "$EXPORT_PATH"
+    echo "$BIN_PATH"
     exit 1
     ;;
 esac
