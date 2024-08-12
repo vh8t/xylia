@@ -1,0 +1,23 @@
+proc strlen ptr s in
+  0 s
+  while dup derefc 0 ! do
+    inc swap
+    inc swap
+  end
+  drop
+end
+
+proc print ptr s in
+  1 1 s dup strlen
+  syscall 4
+end
+
+proc println ptr s in
+  s print
+  "\n" print
+end
+
+proc exit int i in
+  60 i
+  syscall 2
+end

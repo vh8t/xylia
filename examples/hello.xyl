@@ -1,0 +1,6 @@
+import std
+
+proc main in
+  "Hello, World!" println
+  0 return
+end

@@ -1,0 +1,25 @@
+import std
+
+proc main in
+  # Loop from 0 to 9
+  0 while dup 10 < do
+    dup dump
+    1 +
+  end
+  
+  # Check if 2 + 3 is not equal to 5
+  2 3 + 5 =
+  
+  # if the result is true
+  if
+    true if
+      "Hello, World!" println
+    end
+    "Hi\n" print
+  else
+    1 1 "Hello\n" strlen
+    syscall 4
+  end
+  
+  0 return
+end

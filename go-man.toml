@@ -1,0 +1,4 @@
+[Project]
+name = "xylia"
+build_dir = "build"
+make = "src/main.go"
