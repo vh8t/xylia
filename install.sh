@@ -34,7 +34,10 @@ ARCH=$(uname -m)
 if [ "$OS" = "Linux" ]; then
   if [ "$ARCH" = "x86_64" ]; then
     # Linux Intel install
-    echo "Linux x86_64"
+    git clone --depth 1 https://github.com/vh8t/xylia.git ~/.xylia
+    cd ~/.xylia
+    mdkir bin
+    go -o bin/xylia src/main.go
   elif [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then
     # Linux ARM install
     echo "This platform is not yet supported"
