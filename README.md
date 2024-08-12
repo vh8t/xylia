@@ -43,7 +43,7 @@ cd ~/.xylia
 
 ```sh
 mkdir bin
-go -o bin/xylia src/main.go
+go build -o bin/xylia src/main.go
 ```
 
 4. **Set Up Environment Variables**: To use Xylia from any terminal session, add the Xylia binary directory to your system's `PATH`.

@@ -37,7 +37,7 @@ if [ "$OS" = "Linux" ]; then
     git clone --depth 1 https://github.com/vh8t/xylia.git ~/.xylia
     cd ~/.xylia
     mkdir bin
-    go -o bin/xylia src/main.go
+    go build -o bin/xylia src/main.go
   elif [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then
     # Linux ARM install
     echo "This platform is not yet supported"
