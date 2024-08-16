@@ -8,7 +8,7 @@ import (
 	"xyl/src/parser"
 )
 
-const VERSION = "v0.1.0"
+const VERSION = "v0.1.3"
 
 func usage() {
 	fmt.Println("Usage:")
