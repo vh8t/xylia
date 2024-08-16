@@ -49,5 +49,5 @@ func main() {
 	}
 	l.Lex()
 
-	parser.Parse(*l)
+	parser.Parse(*l, []string{})
 }

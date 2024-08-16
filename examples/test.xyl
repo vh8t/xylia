@@ -1,4 +1,4 @@
-import std
+import linux.io
 
 proc main in
   # Loop from 0 to 9

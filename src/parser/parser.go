@@ -119,6 +119,15 @@ func containsStr(list []Function, target string) bool {
 	return false
 }
 
+func strContains(list []string, target string) bool {
+	for _, i := range list {
+		if i == target {
+			return true
+		}
+	}
+	return false
+}
+
 func findFunc(list []Function, target string) Function {
 	for _, i := range list {
 		if i.Name == target {
@@ -128,7 +137,7 @@ func findFunc(list []Function, target string) Function {
 	return Function{}
 }
 
-func Parse(lex lexer.Lexer) (string, string, []Function) {
+func Parse(lex lexer.Lexer, libs []string) (string, string, []Function, []string) {
 	if len(lex.Errors) != 0 {
 		for _, err := range lex.Errors {
 			fmt.Println(err)
@@ -264,23 +273,27 @@ func Parse(lex lexer.Lexer) (string, string, []Function) {
 				}
 				libPath = modulePath
 			}
-			l, err := lexer.NewLexer(libPath, true, lex.Clean)
-			if err != nil {
-				fmt.Printf("Could not compile lib `%s`\n%s\n", libPath, err.Error())
-				os.Exit(1)
-			}
-
-			l.Lex()
-			libText, libData, libFunctions := Parse(*l)
-			text += libText
-			data += libData
-			for _, fn := range libFunctions {
-				if contains(functions, fn) {
-					fmt.Printf("Duplicate function `%s` imported\n", fn.Name)
+			if !strContains(libs, libPath) {
+				l, err := lexer.NewLexer(libPath, true, lex.Clean)
+				if err != nil {
+					fmt.Printf("Could not compile lib `%s`\n%s\n", libPath, err.Error())
 					os.Exit(1)
 				}
+
+				l.Lex()
+				libText, libData, libFunctions, newLibs := Parse(*l, libs)
+				text += libText
+				data += libData
+				for _, fn := range libFunctions {
+					if contains(functions, fn) {
+						fmt.Printf("Duplicate function `%s` imported\n", fn.Name)
+						os.Exit(1)
+					}
+				}
+				functions = append(functions, libFunctions...)
+				libs = newLibs
+				libs = append(libs, libPath)
 			}
-			functions = append(functions, libFunctions...)
 			text += fmt.Sprintf("\t## FILE %s ##\n", lex.Filename)
 		} else if token.Kind == lexer.PROC {
 			// TODO: Make sure the user cant use reserved keywords
@@ -452,7 +465,7 @@ func Parse(lex lexer.Lexer) (string, string, []Function) {
 	if !lex.IsLib {
 		code = fmt.Sprintf(".section .data\n%s\n.section .text\n\t.global _start\n%s\n%s\n_start:\n\tcall main\n\tpush %%rax\n\tmovq $60, %%rax\n\tpop %%rdi\n\tsyscall\n", data, printNumText, text)
 	} else {
-		return text, data, functions
+		return text, data, functions, libs
 	}
 
 	baseName := filepath.Base(lex.Filename)
@@ -500,5 +513,5 @@ func Parse(lex lexer.Lexer) (string, string, []Function) {
 		}
 	}
 
-	return "", "", []Function{}
+	return "", "", []Function{}, []string{}
 }

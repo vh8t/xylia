@@ -1,0 +1,35 @@
+import linux.io
+
+proc open ptr filename ptr flags in
+  2 filename 
+
+  "r" flags strcmp
+  if
+    0
+  else
+    "w" flags strcmp
+    if
+      577
+    else
+      "a" flags strcmp
+      if
+        1089
+      else
+        0
+      end
+    end
+  end
+
+  438
+  syscall 4
+end
+
+proc close int fd in
+  3 fd
+  syscall 2
+end
+
+proc write int fd ptr text in
+  1 fd text dup strlen
+  syscall 4
+end

@@ -17,7 +17,58 @@ proc println ptr s in
   "\n" print
 end
 
-proc exit int i in
-  60 i
+proc exit int e in
+  60 e
   syscall 2
+end
+
+proc strcmp ptr s1 ptr s2 in
+  s1 strlen s2 strlen
+  ! if
+    false return
+  end
+
+  0 while dup dup s1 + derefc swap s2 + derefc = do
+    dup s1 + derefc 0
+    = if
+      true return
+    end
+    inc
+  end
+
+  false return
+end
+
+proc open ptr filename ptr flags in
+  2 filename 
+
+  "r" flags strcmp
+  if
+    0
+  else
+    "w" flags strcmp
+    if
+      577
+    else
+      "a" flags strcmp
+      if
+        1089
+      else
+        0
+      end
+    end
+  end
+
+  438
+  syscall 4
+end
+
+proc close int fd in
+  3 fd
+  syscall 2
+end
+
+proc write int fd ptr text in
+  1 fd text dup strlen
+  syscall 4
 end

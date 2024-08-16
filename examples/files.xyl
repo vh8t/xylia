@@ -1,0 +1,8 @@
+import linux.fs
+
+proc main in
+  "hello.txt" "w" open          # Open file called "hello.txt", file will be created if doesn't exit
+  dup "Hello, World!\n" write   # duplicate the returned file decriptor so after write function it is still there
+  close                         # close the file
+  0 return
+end

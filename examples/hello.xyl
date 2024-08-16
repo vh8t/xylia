@@ -1,4 +1,4 @@
-import std
+import linux.io
 
 proc main in
   "Hello, World!" println

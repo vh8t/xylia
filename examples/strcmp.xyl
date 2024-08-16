@@ -1,0 +1,7 @@
+import std
+
+proc main in
+  "Hello" "Hello" strcmp
+  dump
+  0 return
+end

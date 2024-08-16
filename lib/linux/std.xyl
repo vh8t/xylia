@@ -1,0 +1,4 @@
+proc exit int e in
+  60 e
+  syscall 2
+end

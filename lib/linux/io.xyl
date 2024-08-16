@@ -1,0 +1,35 @@
+proc strlen ptr s in
+  0 s
+  while dup derefc 0 ! do
+    inc swap
+    inc swap
+  end
+  drop
+end
+
+proc strcmp ptr s1 ptr s2 in
+  s1 strlen s2 strlen
+  ! if
+    false return
+  end
+
+  0 while dup dup s1 + derefc swap s2 + derefc = do
+    dup s1 + derefc 0
+    = if
+      true return
+    end
+    inc
+  end
+
+  false return
+end
+
+proc print ptr s in
+  1 1 s dup strlen
+  syscall 4
+end
+
+proc println ptr s in
+  s print
+  "\n" print
+end
