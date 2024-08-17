@@ -168,6 +168,7 @@ proc main in
     cwd 256 getcwd   # Call getcwd function `proc getcwd ptr buf int size in`
     cwd println
     0 return
+end
 ```
 
 This procedure puts `1` (sys_write), `1` (stdout), `"Hello, World!\n"` (const char *buffer) and `14` (size_t length) onto the stack and then calls syscall with `4` arguments, this prints the `Hello, World!` text to the terminal
