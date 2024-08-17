@@ -160,7 +160,7 @@ Buffer is like a fixed size variable, you can create a fixed size buffer and use
 
 ```xyl
 import linux.os
-import linyx.io
+import linux.io
 
 buffer cwd 256      # Allocates buffer with 256 bytes of uninitialized memory
 
