@@ -137,7 +137,7 @@ func findFunc(list []Function, target string) Function {
 	return Function{}
 }
 
-func Parse(lex lexer.Lexer, libs []string) (string, string, []Function, []string) {
+func Parse(lex lexer.Lexer, libs []string) (string, string, string, []Function, []string, []string) {
 	if len(lex.Errors) != 0 {
 		for _, err := range lex.Errors {
 			fmt.Println(err)
@@ -152,10 +152,11 @@ func Parse(lex lexer.Lexer, libs []string) (string, string, []Function, []string
 	}
 
 	registers := []string{"rax", "rdi", "rsi", "rdx", "r10", "r8", "r9"}
-	var text, data string
+	var text, data, bss string
 	var functions []Function
 	var ifQueue []Label
 	var funcQueue []Function
+	var buffers []string
 
 	for i := 0; i < len(lex.Tokens); i++ {
 		token := lex.Tokens[i]
@@ -281,16 +282,24 @@ func Parse(lex lexer.Lexer, libs []string) (string, string, []Function, []string
 				}
 
 				l.Lex()
-				libText, libData, libFunctions, newLibs := Parse(*l, libs)
+				libText, libData, libBss, libFunctions, newLibs, newBuffers := Parse(*l, libs)
 				text += libText
 				data += libData
+				bss += libBss
 				for _, fn := range libFunctions {
 					if contains(functions, fn) {
 						fmt.Printf("Duplicate function `%s` imported\n", fn.Name)
 						os.Exit(1)
 					}
 				}
+				for _, buf := range newBuffers {
+					if strContains(buffers, buf) {
+						fmt.Printf("Duplicate buffer `%s` imported\n", buf)
+						os.Exit(1)
+					}
+				}
 				functions = append(functions, libFunctions...)
+				buffers = append(buffers, newBuffers...)
 				libs = newLibs
 				libs = append(libs, libPath)
 			}
@@ -431,6 +440,25 @@ func Parse(lex lexer.Lexer, libs []string) (string, string, []Function, []string
 				text += "\tpop %rax\n"
 				text += "\tmov (%rax), %rbx\n"
 				text += "\tpush %rbx\n"
+			case "buffer":
+				if i+2 < len(lex.Tokens) {
+					name := lex.Tokens[i+1]
+					size := lex.Tokens[i+2]
+					if name.Kind != lexer.CALL {
+						fmt.Printf("%d:%d %s Error: Expected buffer name got `%s` instead\n", name.Row, name.Col, lex.Filename, name.Value)
+						os.Exit(1)
+					} else if size.Kind != lexer.INT {
+						fmt.Printf("%d:%d %s Error: Expected buffer size got `%s` instead\n", size.Row, size.Col, lex.Filename, size.Value)
+						os.Exit(1)
+					}
+					bss += fmt.Sprintf("%s:\n", name.Value)
+					bss += fmt.Sprintf("\t.space %s\n", size.Value)
+					buffers = append(buffers, name.Value)
+					i += 2
+				} else {
+					fmt.Printf("%d:%d %s Error: Not enough arguments for buffer\n", token.Row, token.Col, lex.Filename)
+					os.Exit(1)
+				}
 			}
 		} else if token.Kind == lexer.CALL {
 			if containsStr(functions, token.Value) {
@@ -441,21 +469,27 @@ func Parse(lex lexer.Lexer, libs []string) (string, string, []Function, []string
 				}
 				text += "\tpush %rax\n"
 			} else {
-				if len(funcQueue) > 0 {
-					if _, ok := funcQueue[len(funcQueue)-1].Args[token.Value]; ok {
-						text += fmt.Sprintf("\t## GET ARG %s ##\n", token.Value)
-						offset := (len(funcQueue[len(funcQueue)-1].Args) - 1) - funcQueue[len(funcQueue)-1].Args[token.Value]
-						text += "\tmovq %rbp, %rax\n"
-						text += fmt.Sprintf("\tadd $%d, %%rax\n", offset*8+16)
-						text += "\tmovq (%rax), %rbx\n"
-						text += "\tpush %rbx\n"
+				if strContains(buffers, token.Value) {
+					text += "\t## GET BUFFER ##\n"
+					text += fmt.Sprintf("\tmovq $%s, %%rax\n", token.Value)
+					text += "\tpush %rax\n"
+				} else {
+					if len(funcQueue) > 0 {
+						if _, ok := funcQueue[len(funcQueue)-1].Args[token.Value]; ok {
+							text += fmt.Sprintf("\t## GET ARG %s ##\n", token.Value)
+							offset := (len(funcQueue[len(funcQueue)-1].Args) - 1) - funcQueue[len(funcQueue)-1].Args[token.Value]
+							text += "\tmovq %rbp, %rax\n"
+							text += fmt.Sprintf("\tadd $%d, %%rax\n", offset*8+16)
+							text += "\tmovq (%rax), %rbx\n"
+							text += "\tpush %rbx\n"
+						} else {
+							fmt.Printf("%d:%d %s Error: Unknown argument `%s`\n", token.Row, token.Col, lex.Filename, token.Value)
+							os.Exit(1)
+						}
 					} else {
-						fmt.Printf("%d:%d %s Error: Unknown argument `%s`\n", token.Row, token.Col, lex.Filename, token.Value)
+						fmt.Printf("%d:%d %s Error: Unknown keyword `%s`\n", token.Row, token.Col, lex.Filename, token.Value)
 						os.Exit(1)
 					}
-				} else {
-					fmt.Printf("%d:%d %s Error: Unknown function `%s`\n", token.Row, token.Col, lex.Filename, token.Value)
-					os.Exit(1)
 				}
 			}
 		}
@@ -463,9 +497,9 @@ func Parse(lex lexer.Lexer, libs []string) (string, string, []Function, []string
 
 	var code string
 	if !lex.IsLib {
-		code = fmt.Sprintf(".section .data\n%s\n.section .text\n\t.global _start\n%s\n%s\n_start:\n\tcall main\n\tpush %%rax\n\tmovq $60, %%rax\n\tpop %%rdi\n\tsyscall\n", data, printNumText, text)
+		code = fmt.Sprintf(".section .data\n%s\n.section .bss\n%s\n.section .text\n\t.global _start\n%s\n%s\n_start:\n\tcall main\n\tpush %%rax\n\tmovq $60, %%rax\n\tpop %%rdi\n\tsyscall\n", data, bss, printNumText, text)
 	} else {
-		return text, data, functions, libs
+		return text, data, bss, functions, libs, buffers
 	}
 
 	baseName := filepath.Base(lex.Filename)
@@ -513,5 +547,5 @@ func Parse(lex lexer.Lexer, libs []string) (string, string, []Function, []string
 		}
 	}
 
-	return "", "", []Function{}, []string{}
+	return "", "", "", []Function{}, []string{}, []string{}
 }

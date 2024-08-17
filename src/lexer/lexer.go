@@ -272,7 +272,7 @@ func (l *Lexer) LexToken() {
 				l.Move()
 			}
 			l.Tokens.AppendToken(IMPORT, value, row, col)
-		case "dup", "drop", "swap", "inc", "dec", "dump", "return", "if", "end", "else", "while", "do", "derefc", "derefi":
+		case "dup", "drop", "swap", "inc", "dec", "dump", "return", "if", "end", "else", "while", "do", "derefc", "derefi", "buffer":
 			l.Tokens.AppendToken(KEYWORD, str, row, col)
 		default:
 			l.Tokens.AppendToken(CALL, str, row, col)

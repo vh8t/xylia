@@ -1,0 +1,12 @@
+import linux.fs
+import linux.io
+
+buffer filecontent 4096
+
+proc main in
+  "hello.txt" "r" open
+  dup filecontent 4096 read
+  close
+  filecontent println
+  0 return
+end

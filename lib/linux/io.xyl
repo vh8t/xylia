@@ -33,3 +33,8 @@ proc println ptr s in
   s print
   "\n" print
 end
+
+proc input ptr buf int size in
+  0 1 buf size
+  syscall 4
+end

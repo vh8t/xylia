@@ -1,0 +1,4 @@
+proc getcwd ptr buf int size in
+  79 buf size
+  syscall 3
+end

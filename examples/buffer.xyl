@@ -1,0 +1,10 @@
+import linux.io
+
+buffer message 128
+
+proc main in
+  message 128 input
+  message println
+
+  0 return
+end

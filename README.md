@@ -6,7 +6,7 @@ The compiler is still missing many features and the programming language is pret
 
 # Prerequisities
 
-Xylia only supports Lunux x86_64 for now but I am working on arm64 version as well.
+Xylia only supports Linux x86_64 for now but I am working on arm64 version as well.
 In the future I would like to expand it to work on OSX and Apple Silicon.
 
 You will need the following tools
@@ -98,7 +98,7 @@ This code will push 1 and 1 onto the stack and then we use the `+` to add the to
 ## Procedures
 
 ```xyl
-proc add int num1 int num2 in
+proc add int num1 int num2 in       # C equivalent `int add(int num1, int num2)`
     num1 num2 +
     return
 end
@@ -115,7 +115,7 @@ This program will add 10 and 12 and print it out
 ## Code branching
 
 ```xyl
-import std
+import linux.io
 
 proc main in
     1 2 =       # Compare 1 and 2 for equality
@@ -154,6 +154,22 @@ proc main in
 end
 ```
 
+## Buffers
+
+Buffer is like a fixed size variable, you can create a fixed size buffer and use it as a variable for procedures
+
+```xyl
+import linux.os
+import linyx.io
+
+buffer cwd 256      # Allocates buffer with 256 bytes of uninitialized memory
+
+proc main in
+    cwd 256 getcwd   # Call getcwd function `proc getcwd ptr buf int size in`
+    cwd println
+    0 return
+```
+
 This procedure puts `1` (sys_write), `1` (stdout), `"Hello, World!\n"` (const char *buffer) and `14` (size_t length) onto the stack and then calls syscall with `4` arguments, this prints the `Hello, World!` text to the terminal
 
 ## Keywords
@@ -172,3 +188,4 @@ This procedure puts `1` (sys_write), `1` (stdout), `"Hello, World!\n"` (const ch
 - `in` end of process arguments, start of process body
 - `true` push `1` on stack
 - `false` push `0` on stack
+- `buffer` create new buffer

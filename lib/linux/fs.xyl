@@ -33,3 +33,8 @@ proc write int fd ptr text in
   1 fd text dup strlen
   syscall 4
 end
+
+proc read int fd ptr buf int size in
+  0 fd buf size
+  syscall 4
+end
