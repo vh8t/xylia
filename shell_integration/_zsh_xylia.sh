@@ -13,6 +13,7 @@ _xylia() {
 
   subcmds=(
     'run:Run a Xylia script file'
+    'test:Runs the tests from a Xylia script file'
     'repl:Start interactive REPL session'
     'docs:Generate documentation from source files'
     'help:Show this help message'

@@ -5,7 +5,7 @@ _xylia_completions() {
   prev="${COMP_WORDS[COMP_CWORD - 1]}"
 
   opts="--help -h --version -V --verbose -v --bash --zsh --bash"
-  subcmds="run repl docs help version"
+  subcmds="run test repl docs help version"
 
   if [[ ${COMP_CWORD} -eq 1 ]]; then
     COMPREPLY=($(compgen -W "${opts} ${subcmds}" -- "$cur"))
