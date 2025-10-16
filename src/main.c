@@ -60,6 +60,7 @@ typedef struct {
 
 static const subcommand_t subcommands[] = {
     {"run", cli_run, "Run a Xylia script file"},
+    {"test", cli_run_test, "Run a Xylia test file"},
     {"repl", cli_repl, "Start interactive REPL session"},
     {"docs", cli_docs, "Generate documentation from source files"},
     {NULL, NULL, NULL} // Sentinel
