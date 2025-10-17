@@ -1351,16 +1351,24 @@ static void write_type_hint_html(FILE *f, const type_hint_t *hint) {
   fprintf(f, "</span>");
 }
 
-static void write_function_html(FILE *f, doc_function_t *func) {
+static void write_function_html(FILE *f, doc_function_t *func,
+                                const char *class_name) {
   fprintf(f, "        <div class=\"function\" id=\"%s\">\n", func->name);
   fprintf(f, "            <div class=\"function-header\">\n");
-  fprintf(f, "                <h3>%s</h3>\n", func->name);
+  if (class_name == NULL)
+    fprintf(f, "                <h3>%s</h3>\n", func->name);
+  else
+    fprintf(f, "                <h3>%s::%s</h3>\n", class_name, func->name);
   fprintf(f, "            </div>\n");
   fprintf(f, "            <div class=\"function-body\">\n");
 
   // Function signature
   fprintf(f, "                <div class=\"signature\">\n");
-  fprintf(f, "                    <code>func %s(", func->name);
+  if (class_name == NULL)
+    fprintf(f, "                    <code>func %s(", func->name);
+  else
+    fprintf(f, "                    <code>func %s::%s(", class_name,
+            func->name);
 
   doc_param_t *param = func->params;
   bool first = true;
@@ -1469,7 +1477,7 @@ static void write_class_html(FILE *f, doc_class_t *cls) {
     fprintf(f, "                <h3>Methods</h3>\n");
     doc_function_t *method = cls->methods;
     while (method) {
-      write_function_html(f, method);
+      write_function_html(f, method, cls->name);
       method = method->next;
     }
   }
@@ -1545,7 +1553,7 @@ bool generate_docs_html(doc_module_t *module, const doc_options_t *options) {
     doc_function_t *func = module->functions;
     while (func) {
       if (!func->is_method) { // Only include non-method functions
-        write_function_html(f, func);
+        write_function_html(f, func, NULL);
       }
       func = func->next;
     }

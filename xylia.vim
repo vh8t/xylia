@@ -12,6 +12,7 @@ syn keyword xylKeyword class else enum for func if return super self let while o
 
 syn keyword xylBoolean true false
 syn keyword xylNil nil
+syn keyword xylTypes bool number float function class instance builtin string vector list array file nan module range result enum Any
 
 syn match xylModuleAccessor /\<[A-Za-z_][A-Za-z0-9_]*\>\ze::/
 
@@ -37,6 +38,7 @@ hi def link xylKeyword        Keyword
 hi def link xylModuleAccessor Structure
 hi def link xylBoolean        Boolean
 hi def link xylNil            Constant
+hi def link xylTypes          Constant
 hi def link xylComment        Comment
 hi def link xylString         String
 hi def link xylNumber         Number
