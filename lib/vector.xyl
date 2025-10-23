@@ -15,7 +15,7 @@ class Vector {
   func pop() -> Any                      { return __builtin___pop(self.data); }
   func insert(index: number, value: Any) { __builtin___insert(self.data, index, value); }
   func remove(index: number) -> Any      { return __builtin___remove(self.data, index); }
-  func to_string() -> string             { return __builtin___string(self.data); }
+  func to_string() -> string             { return string(self.data); }
 
   operator [] (index: number) -> Any                { return self.data[index]; }
   operator []= (index: number, value: Any)          { self.data[index] = value; }

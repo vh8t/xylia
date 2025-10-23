@@ -16,7 +16,7 @@ class Array {
 
   --- Returns a string representation of the array’s contents.
   func to_string() -> string {
-    return __builtin___string(self.data);
+    return string(self.data);
   }
 
   --- Resizes the array to `new_size`.
